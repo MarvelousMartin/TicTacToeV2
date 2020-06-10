@@ -38,6 +38,12 @@ public class AdminControl implements Initializable {
     @FXML
     private TextField player_id;
     @FXML
+    private TextField player_username;
+    @FXML
+    private TextField player_password;
+    @FXML
+    private TextField player_division;
+    @FXML
     private TextField player_firstname;
     @FXML
     private TextField player_lastname;
@@ -72,10 +78,7 @@ public class AdminControl implements Initializable {
     private DatabaseConnection databaseConnection;
     private ObservableList<PlayerData> player_data;
 
-    private String player_sql = "SELECT * FROM players";
-
-    private String player_name = "SELECT fname FROM players";
-    private String player_surname = "SELECT lname FROM players";
+    private String player_sql = "SELECT * FROM users";
     /**
      * Start of the application
      */
@@ -137,8 +140,8 @@ public class AdminControl implements Initializable {
             return;
         }
 
-        String sqlInsert = "INSERT INTO players(id, fname, lname, Win, Loss) VALUES (?, ?, ?, ?, ?)"; //insert data (in this case id, first name,...) to 5 columns
-        String sqlIDCheck = String.format("SELECT * FROM players WHERE id = %d", id);
+        String sqlInsert = "INSERT INTO users(id, username, password, division, fname, lname, Win, Loss) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"; //insert data (in this case id, first name,...) to 5 columns
+        String sqlIDCheck = String.format("SELECT * FROM users WHERE id = %d", id);
         try {
             Connection connection = DatabaseConnection.getConnection();
             PreparedStatement player_preparedStatement = connection.prepareStatement(sqlInsert);
@@ -162,10 +165,13 @@ public class AdminControl implements Initializable {
                     Put text into TextField, this text uploads to database, then show up in the table
                  */
                 player_preparedStatement.setString(1, id.toString());
-                player_preparedStatement.setString(2, this.player_firstname.getText());
-                player_preparedStatement.setString(3, this.player_lastname.getText());
-                player_preparedStatement.setString(4, this.player_win.getText());
-                player_preparedStatement.setString(5, this.player_loss.getText());
+                player_preparedStatement.setString(2, this.player_username.getText());
+                player_preparedStatement.setString(3, this.player_password.getText());
+                player_preparedStatement.setString(4, this.player_division.getText());
+                player_preparedStatement.setString(5, this.player_firstname.getText());
+                player_preparedStatement.setString(6, this.player_lastname.getText());
+                player_preparedStatement.setString(7, this.player_win.getText());
+                player_preparedStatement.setString(8, this.player_loss.getText());
 
                 player_preparedStatement.execute();
                 this.error.setText("");
@@ -186,8 +192,18 @@ public class AdminControl implements Initializable {
 
     @FXML
     private void loadAdminInfo() {
-        this.name.setText(player_name);
-        this.surname.setText(player_surname);
+        try {
+            Connection connection = DatabaseConnection.getConnection();
+            ResultSet player_resultSet = connection.createStatement().executeQuery(player_sql);
+
+            String adminName = player_resultSet.getString(5);
+            this.name.setText(adminName);
+            String adminSurname = player_resultSet.getString(6);
+            this.surname.setText(adminSurname);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**
@@ -198,6 +214,8 @@ public class AdminControl implements Initializable {
     @FXML
     private void clear(ActionEvent actionEvent) {
         this.player_id.setText("");
+        this.player_username.setText("");
+        this.player_password.setText("");
         this.player_firstname.setText("");
         this.player_lastname.setText("");
     }

@@ -32,7 +32,7 @@ public class LoginModel {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
-        String sql = "SELECT * FROM players where username = ? and password = ? and division = ?";
+        String sql = "SELECT * FROM users where username = ? and password = ? and division = ?";
 
         try {
             preparedStatement = this.connection.prepareStatement(sql); //logging in, checking via SQL
